@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "bolt-expo-nativewind",
+    "slug": "bolt-expo-nativewind",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.bolt.expostarter",
+      "permissions": ["INTERNET"],
+      "networkSecurityConfig": {
+        "cleartextTrafficPermitted": true,
+        "domains": {
+          "localhost": {
+            "cleartextPermitted": true
+          },
+          "10.0.2.2": {
+            "cleartextPermitted": true
+          },
+          "192.168.48.203": {
+            "cleartextPermitted": true
+          }
+        }
+      }
+    }
+  }
+}
