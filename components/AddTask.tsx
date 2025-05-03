@@ -1,172 +1,274 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { useState } from 'react';
 import { useTaskStore } from '@/store/taskStore';
-import { Plus } from 'lucide-react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Feather } from '@expo/vector-icons';
 
-export default function AddTask() {
-  const { colors, typography } = useTheme();
+export const AddTask = ({ onClose }: { onClose: () => void }) => {
+  const { colors } = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const addTask = useTaskStore((state) => state.addTask);
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState('17:00');
+  const [selectedCategory, setSelectedCategory] = useState<string>('default');
+  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH'>('MEDIUM');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const addTask = useTaskStore((state) => state.addTask);
+  const categories = useTaskStore((state) => state.categories);
+
+  const priorityColors = {
+    LOW: '#7ED321',
+    MEDIUM: '#F5A623',
+    HIGH: '#D0021B',
+  };
 
   const handleAddTask = async () => {
+    if (!title.trim()) {
+      setError('Title is required');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
     try {
-      console.log('Attempting to add task with data:', {
-        title,
-        description,
-        startTime,
-        endTime
-      });
-
-      // Validate input
-      if (!title.trim()) {
-        Alert.alert('Error', 'Please enter a task title');
-        return;
-      }
-
-      if (!startTime.trim() || !endTime.trim()) {
-        Alert.alert('Error', 'Please enter both start and end times');
-        return;
-      }
-
-      setIsLoading(true);
-
-      // Create task object
-      const newTask = {
+      await addTask({
         title: title.trim(),
         description: description.trim(),
-        startTime: startTime.trim(),
-        endTime: endTime.trim(),
+        startTime,
+        endTime,
+        categoryId: selectedCategory,
+        priority,
+        completed: false,
+        createdAt: new Date().toISOString(),
         team: [],
         progress: 0,
-        color: '#f8e9f0',
+        color: colors.categoryPeach,
         daysRemaining: 7,
-        categoryId: 'default'
-      };
+      });
 
-      console.log('Creating task with data:', newTask);
-
-      // Add task to store
-      await addTask(newTask);
-      
-      console.log('Task added successfully');
-
-      // Reset form
       setTitle('');
       setDescription('');
-      setStartTime('');
-      setEndTime('');
-
-      // Show success message
-      Alert.alert('Success', 'Task added successfully');
+      setStartTime('09:00');
+      setEndTime('17:00');
+      setSelectedCategory('default');
+      setPriority('MEDIUM');
+      onClose();
     } catch (error) {
       console.error('Error adding task:', error);
-      Alert.alert('Error', 'Failed to add task. Please try again.');
+      setError('Failed to add task. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={[typography.sectionTitle, { color: colors.textPrimary }]}>
-        Add New Task
-      </Text>
-      
-      <View style={styles.form}>
-        <TextInput
-          style={[styles.input, { color: colors.textPrimary, borderColor: colors.border }]}
-          placeholder="Task Title"
-          placeholderTextColor={colors.textSecondary}
-          value={title}
-          onChangeText={setTitle}
-        />
-        
-        <TextInput
-          style={[styles.input, { color: colors.textPrimary, borderColor: colors.border }]}
-          placeholder="Description (optional)"
-          placeholderTextColor={colors.textSecondary}
-          value={description}
-          onChangeText={setDescription}
-          multiline
-        />
-        
-        <View style={styles.timeInputs}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.card, color: colors.textPrimary }]}
+        placeholder="Task title"
+        placeholderTextColor={colors.textSecondary}
+        value={title}
+        onChangeText={setTitle}
+      />
+
+      <TextInput
+        style={[styles.input, styles.descriptionInput, { backgroundColor: colors.card, color: colors.textPrimary }]}
+        placeholder="Description"
+        placeholderTextColor={colors.textSecondary}
+        value={description}
+        onChangeText={setDescription}
+        multiline
+      />
+
+      <View style={styles.timeContainer}>
+        <View style={styles.timeInput}>
+          <Text style={[styles.label, { color: colors.textPrimary }]}>Start Time</Text>
           <TextInput
-            style={[styles.timeInput, { color: colors.textPrimary, borderColor: colors.border }]}
-            placeholder="Start Time (e.g., 9:00 AM)"
-            placeholderTextColor={colors.textSecondary}
+            style={[styles.input, { backgroundColor: colors.card, color: colors.textPrimary }]}
             value={startTime}
             onChangeText={setStartTime}
-          />
-          
-          <TextInput
-            style={[styles.timeInput, { color: colors.textPrimary, borderColor: colors.border }]}
-            placeholder="End Time (e.g., 5:00 PM)"
+            placeholder="HH:MM"
             placeholderTextColor={colors.textSecondary}
-            value={endTime}
-            onChangeText={setEndTime}
           />
         </View>
-        
-        <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={handleAddTask}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <Text style={[typography.buttonText, { color: colors.textPrimary }]}>
-              Adding...
-            </Text>
-          ) : (
-            <>
-              <Plus size={16} color={colors.textPrimary} />
-              <Text style={[typography.buttonText, { color: colors.textPrimary, marginLeft: 8 }]}>
-                Add Task
-              </Text>
-            </>
-          )}
-        </TouchableOpacity>
+
+        <View style={styles.timeInput}>
+          <Text style={[styles.label, { color: colors.textPrimary }]}>End Time</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.card, color: colors.textPrimary }]}
+            value={endTime}
+            onChangeText={setEndTime}
+            placeholder="HH:MM"
+            placeholderTextColor={colors.textSecondary}
+          />
+        </View>
       </View>
-    </View>
+
+      <Text style={[styles.label, { color: colors.textPrimary }]}>Priority</Text>
+      <View style={styles.priorityContainer}>
+        {(['LOW', 'MEDIUM', 'HIGH'] as const).map((level) => (
+          <TouchableOpacity
+            key={level}
+            style={[
+              styles.priorityButton,
+              { backgroundColor: priority === level ? priorityColors[level] : colors.card },
+            ]}
+            onPress={() => setPriority(level)}
+          >
+            <Text
+              style={[
+                styles.priorityText,
+                { color: priority === level ? '#FFFFFF' : colors.textPrimary },
+              ]}
+            >
+              {level}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <Text style={[styles.label, { color: colors.textPrimary }]}>Category</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.categoriesContainer}
+      >
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category.id}
+            style={[
+              styles.categoryButton,
+              { backgroundColor: colors.card },
+              selectedCategory === category.id && { backgroundColor: category.color },
+            ]}
+            onPress={() => setSelectedCategory(category.id)}
+          >
+            <View style={[styles.categoryColor, { backgroundColor: category.color }]} />
+            <Text
+              style={[
+                styles.categoryText,
+                { color: selectedCategory === category.id ? '#FFFFFF' : colors.textPrimary },
+              ]}
+            >
+              {category.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {error && (
+        <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+      )}
+
+      <TouchableOpacity
+        style={[styles.addButton, { backgroundColor: colors.primary }]}
+        onPress={handleAddTask}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator color="#FFFFFF" />
+        ) : (
+          <Text style={styles.addButtonText}>Add Task</Text>
+        )}
+      </TouchableOpacity>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
-  },
-  form: {
-    marginTop: 16,
+    flex: 1,
+    padding: 16,
   },
   input: {
-    borderWidth: 1,
+    height: 48,
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    fontSize: 16,
+    paddingHorizontal: 16,
+    marginBottom: 16,
   },
-  timeInputs: {
+  descriptionInput: {
+    height: 100,
+    textAlignVertical: 'top',
+    paddingTop: 12,
+  },
+  timeContainer: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'space-between',
     marginBottom: 16,
   },
   timeInput: {
     flex: 1,
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    marginRight: 8,
   },
-  addButton: {
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  priorityContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  priorityButton: {
+    flex: 1,
+    height: 40,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  priorityText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
+    paddingHorizontal: 12,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  categoryColor: {
+    width: 16,
+    height: 16,
     borderRadius: 8,
+    marginRight: 8,
+  },
+  categoryText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  errorText: {
+    fontSize: 14,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  addButton: {
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 }); 

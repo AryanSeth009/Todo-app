@@ -21,6 +21,7 @@ export type Task = {
   completed?: boolean;
   scheduled?: boolean;
   quick?: boolean;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
 };
 
 export type ScheduledTask = {

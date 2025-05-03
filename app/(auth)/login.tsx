@@ -54,7 +54,7 @@ export default function LoginScreen() {
       style={styles.container}
     >
       <ImageBackground
-        source={{ uri: 'https://i.pinimg.com/736x/c1/cb/3a/c1cb3a09b96659db2813e42a1c4a2c74.jpg' }}
+        source={require('@/assets/images/login.jpg')}
         style={styles.container}
         resizeMode="cover"
       >

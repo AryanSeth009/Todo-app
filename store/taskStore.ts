@@ -349,12 +349,12 @@ export const useTaskStore = create(
       updateTask: async (taskId, updates) => {
         try {
           set({ isLoading: true, error: null });
-          const updatedTask = await api.updateTask(taskId, updates);
-          set((state) => ({
-            tasks: state.tasks.map((task) =>
-              task.id === taskId ? updatedTask : task
+        const updatedTask = await api.updateTask(taskId, updates);
+        set((state) => ({
+          tasks: state.tasks.map((task) => 
+            task.id === taskId ? updatedTask : task
             ),
-          }));
+        }));
           // Cancel existing notification and schedule new one if endTime changed
           notificationService.cancelTaskNotification(taskId);
           if (updates.endTime) {
@@ -390,10 +390,10 @@ export const useTaskStore = create(
       deleteTask: async (taskId) => {
         try {
           set({ isLoading: true, error: null });
-          await api.deleteTask(taskId);
-          set((state) => ({
+        await api.deleteTask(taskId);
+        set((state) => ({
             tasks: state.tasks.filter((task) => task.id !== taskId),
-          }));
+        }));
           // Cancel notification when task is deleted
           notificationService.cancelTaskNotification(taskId);
         } catch (error) {
@@ -546,7 +546,7 @@ export const useTaskStore = create(
               else {
                 // Only include tasks that haven't passed their completion time
                 if (!isTaskPastCompletionTime(task)) {
-                  activeTasks.push(task);
+                activeTasks.push(task);
                 } else {
                   // Move past-due tasks to completed
                   const completedTask = {

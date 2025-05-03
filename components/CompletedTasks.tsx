@@ -62,67 +62,67 @@ export default function CompletedTasks() {
     console.log('Manually refreshing completed tasks');
     syncTasksWithBackend();
   };
-
+  
   return (
     <View style={styles.container}>
       {/* Today's completed tasks */}
-      <View style={styles.headerContainer}>
-        <Text style={[typography.sectionTitle, { color: colors.textPrimary }]}>
-          Completed Today
-        </Text>
-        <View style={styles.rightHeader}>
-          <Text style={[typography.small, { color: colors.textSecondary, marginRight: 8 }]}>
-            {todayCompletedTasks.length} {todayCompletedTasks.length === 1 ? 'task' : 'tasks'}
-          </Text>
-          <TouchableOpacity onPress={handleRefresh} disabled={isLoading}>
-            <RefreshCw 
-              size={16} 
-              color={colors.textSecondary} 
-              style={isLoading ? styles.spinning : undefined} 
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      
-      <View style={styles.taskList}>
+          <View style={styles.headerContainer}>
+            <Text style={[typography.sectionTitle, { color: colors.textPrimary }]}>
+              Completed Today
+            </Text>
+            <View style={styles.rightHeader}>
+              <Text style={[typography.small, { color: colors.textSecondary, marginRight: 8 }]}>
+                {todayCompletedTasks.length} {todayCompletedTasks.length === 1 ? 'task' : 'tasks'}
+              </Text>
+              <TouchableOpacity onPress={handleRefresh} disabled={isLoading}>
+                <RefreshCw 
+                  size={16} 
+                  color={colors.textSecondary} 
+                  style={isLoading ? styles.spinning : undefined} 
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          
+          <View style={styles.taskList}>
         {todayCompletedTasks.length > 0 ? (
           todayCompletedTasks.map((task) => (
-            <TaskCard 
-              key={task.id} 
-              task={{...task, completedAt: task.completedAt || new Date()}} 
-            />
+              <TaskCard 
+                key={task.id} 
+                task={{...task, completedAt: task.completedAt || new Date()}} 
+              />
           ))
         ) : (
           <Text style={[typography.body, { color: colors.textSecondary, textAlign: 'center' }]}>
             No tasks completed today
           </Text>
         )}
-      </View>
+          </View>
       
       {/* Recently completed tasks (last 7 days) */}
       <View style={[styles.headerContainer, { marginTop: 24 }]}>
-        <Text style={[typography.sectionTitle, { color: colors.textPrimary }]}>
-          Recently Completed
-        </Text>
-        <Text style={[typography.small, { color: colors.textSecondary }]}>
-          {recentCompletedTasks.length} {recentCompletedTasks.length === 1 ? 'task' : 'tasks'}
-        </Text>
-      </View>
-      
-      <View style={styles.taskList}>
+            <Text style={[typography.sectionTitle, { color: colors.textPrimary }]}>
+              Recently Completed
+            </Text>
+            <Text style={[typography.small, { color: colors.textSecondary }]}>
+              {recentCompletedTasks.length} {recentCompletedTasks.length === 1 ? 'task' : 'tasks'}
+            </Text>
+          </View>
+          
+          <View style={styles.taskList}>
         {recentCompletedTasks.length > 0 ? (
           recentCompletedTasks.map((task) => (
-            <TaskCard 
-              key={task.id} 
-              task={{...task, completedAt: task.completedAt || new Date()}} 
-            />
+              <TaskCard 
+                key={task.id} 
+                task={{...task, completedAt: task.completedAt || new Date()}} 
+              />
           ))
         ) : (
           <Text style={[typography.body, { color: colors.textSecondary, textAlign: 'center' }]}>
             No tasks completed in the last 7 days
           </Text>
         )}
-      </View>
+          </View>
     </View>
   );
 }

@@ -2,17 +2,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Task } from '@/types/task';
 import { Platform } from 'react-native';
 
-// Determine the correct API URL based on platform
+// Determine the correct API URL based on environment
 const getApiUrl = () => {
-  if (Platform.OS === 'android') {
-    // For Android emulator and physical devices
-    return 'http://192.168.48.210:5000/api';
+  if (__DEV__) {
+    // Development environment
+    if (Platform.OS === 'web') {
+      // For web development
+      return 'http://localhost:5000/api';
+    }
+    if (Platform.OS === 'android') {
+      // For Android emulator
+      return 'http://10.0.2.2:5000/api';
+    }
+    // For iOS
+    return 'http://localhost:5000/api';
   }
-  // For iOS
-  return 'http://localhost:5000/api';
+  // Production environment
+  return 'https://todo-app-m0dz.onrender.com/api';
 };
 
 const API_URL = getApiUrl();
+console.log('Environment:', __DEV__ ? 'Development' : 'Production');
 console.log('Platform:', Platform.OS);
 console.log('API URL:', API_URL);
 
@@ -97,7 +107,7 @@ class ApiService {
           'Authorization': `Bearer ${this.token}`,
         };
       }
-
+      
       // Add CORS mode
       options.mode = 'cors';
       
@@ -135,25 +145,25 @@ class ApiService {
         
         console.log('Response status:', response.status);
         console.log('Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
-        
-        // Handle non-JSON responses
-        const contentType = response.headers.get('content-type');
-        let data;
-        
-        if (contentType && contentType.includes('application/json')) {
-          data = await response.json();
-        } else {
-          data = { message: await response.text() };
-        }
+      
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = { message: await response.text() };
+      }
         
         console.log('Response data:', data);
-        
-        if (!response.ok) {
-          console.error(`API Error (${response.status}):`, data);
-          throw new Error(data.error || data.message || 'Something went wrong');
-        }
-        
-        return data;
+      
+      if (!response.ok) {
+        console.error(`API Error (${response.status}):`, data);
+        throw new Error(data.error || data.message || 'Something went wrong');
+      }
+      
+      return data;
       } catch (fetchError) {
         clearTimeout(timeoutId);
         throw fetchError;
@@ -209,20 +219,20 @@ class ApiService {
       }
 
       console.log('Attempting login for:', email);
-      const data = await this.request('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+    const data = await this.request('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
       if (!data || !data.token) {
         throw new Error('Invalid login response: Missing token');
       }
 
       console.log('Login successful, received token');
-      this.token = data.token;
-      await AsyncStorage.setItem('token', data.token);
-      return data;
+    this.token = data.token;
+    await AsyncStorage.setItem('token', data.token);
+    return data;
     } catch (error: any) {
       console.error('Login failed:', error);
       if (error.message.includes('timed out')) {
@@ -246,20 +256,20 @@ class ApiService {
       }
 
       console.log('Attempting registration for:', email);
-      const data = await this.request('/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    const data = await this.request('/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, username }),
-      });
+    });
 
       if (!data || !data.token) {
         throw new Error('Invalid registration response: Missing token');
       }
 
       console.log('Registration successful, received token');
-      this.token = data.token;
-      await AsyncStorage.setItem('token', data.token);
-      return data;
+    this.token = data.token;
+    await AsyncStorage.setItem('token', data.token);
+    return data;
     } catch (error: any) {
       console.error('Registration failed:', error);
       if (error.message.includes('timed out')) {
@@ -316,9 +326,9 @@ class ApiService {
     try {
       console.log('API - Creating task:', task);
       const result = await this.request('/tasks', {
-        method: 'POST',
+            method: 'POST',
         body: JSON.stringify(task),
-      });
+          });
       
       console.log('API - Task creation response:', result);
       

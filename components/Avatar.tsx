@@ -19,7 +19,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <Image
-      source={{ uri: 'https://i.pinimg.com/736x/e5/84/6c/e5846cbdc2902fcb980016c0b38bc5d4.jpg' }}
+      source={require('@/assets/images/profile.jpg')}
       style={[
         styles.avatar,
         { width: size, height: size, borderRadius: size / 2 },

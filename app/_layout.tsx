@@ -23,7 +23,7 @@ export default function RootLayout() {
         // Configure notifications
         notificationService.configure();
         notificationService.createNotificationChannel();
-        
+
         // Wait for next tick
         await new Promise(resolve => setTimeout(resolve, 0));
         
@@ -60,7 +60,7 @@ export default function RootLayout() {
   }, [isAuthenticated, isReady]);
 
   // Always render the Slot first
-  return (
+    return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Slot />
       {!isReady && (
@@ -73,11 +73,11 @@ export default function RootLayout() {
       )}
       {isLoading && (
         <View style={[StyleSheet.absoluteFill, styles.centered]}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.textPrimary }]}>
-            Loading your tasks...
-          </Text>
-        </View>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.textPrimary }]}>
+          Loading your tasks...
+        </Text>
+      </View>
       )}
       <StatusBar style={isDark ? 'light' : 'dark'} />
     </View>

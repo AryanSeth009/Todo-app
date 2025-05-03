@@ -110,7 +110,15 @@ const userSchema = new mongoose.Schema({
   name: String
 });
 
-// Task Schema
+// Category Schema
+const categorySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  color: { type: String, default: '#000000' },
+  icon: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true }
+});
+
+// Enhanced Task Schema
 const taskSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
@@ -121,10 +129,28 @@ const taskSchema = new mongoose.Schema({
   startTime: String,
   endTime: String,
   quick: { type: Boolean, default: false },
-  completedAt: Date
+  completedAt: Date,
+  // New fields
+  priority: { 
+    type: String, 
+    enum: ['LOW', 'MEDIUM', 'HIGH'], 
+    default: 'MEDIUM' 
+  },
+  category: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Category' 
+  },
+  labels: [String],
+  timeSpent: { type: Number, default: 0 }, // in minutes
+  dueDate: Date,
+  subtasks: [{
+    title: String,
+    completed: { type: Boolean, default: false }
+  }]
 });
 
 const User = mongoose.model('User', userSchema);
+const Category = mongoose.model('Category', categorySchema);
 const Task = mongoose.model('Task', taskSchema);
 
 // Auth Middleware
@@ -157,7 +183,7 @@ app.post('/api/auth/register', async (req, res) => {
       name: username // Store the username as name
     });
     await user.save();
-
+    
     // Generate token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
     
@@ -288,6 +314,29 @@ app.put('/api/tasks/:id', async (req, res) => {
   } catch (error) {
     console.error('Error updating task:', error);
     res.status(500).json({ message: 'Error updating task' });
+  }
+});
+
+// Category Routes
+app.post('/api/categories', auth, async (req, res) => {
+  try {
+    const category = new Category({
+      ...req.body,
+      userId: req.user._id
+    });
+    await category.save();
+    res.status(201).send(category);
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+});
+
+app.get('/api/categories', auth, async (req, res) => {
+  try {
+    const categories = await Category.find({ userId: req.user._id });
+    res.send(categories);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 

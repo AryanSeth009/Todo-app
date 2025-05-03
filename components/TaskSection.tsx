@@ -94,9 +94,9 @@ export default function TaskSection() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <Text style={[typography.sectionTitle, { color: colors.textPrimary }]}>
-            Ongoing tasks
-          </Text>
+        <Text style={[typography.sectionTitle, { color: colors.textPrimary }]}>
+          Ongoing tasks
+        </Text>
           <Text style={[typography.small, { color: colors.textSecondary }]}>
             {ongoingTasks.length} tasks
           </Text>
@@ -108,12 +108,12 @@ export default function TaskSection() {
           >
             <RefreshCw size={16} color={colors.textSecondary} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.seeAllButton}>
-            <Text style={[typography.buttonText, { color: colors.textSecondary }]}>
-              See all
-            </Text>
-            <ChevronRight size={16} color={colors.textSecondary} />
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.seeAllButton}>
+          <Text style={[typography.buttonText, { color: colors.textSecondary }]}>
+            See all
+          </Text>
+          <ChevronRight size={16} color={colors.textSecondary} />
+        </TouchableOpacity>
         </View>
       </View>
       

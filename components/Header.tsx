@@ -3,6 +3,7 @@ import { Avatar } from '@/components/Avatar';
 import { useTheme } from '@/hooks/useTheme';
 import { useTaskStore } from '@/store/taskStore';
 import { router } from 'expo-router';
+import React from 'react';
 
 export default function Header() {
   const { colors, typography } = useTheme();
