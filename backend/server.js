@@ -19,7 +19,7 @@ const app = express();
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? process.env.FRONTEND_URL 
-    : 'http://localhost:3000',
+    : ['http://localhost:3000', 'http://localhost:19006', 'http://localhost:19000', 'http://localhost:8081'],
   credentials: true
 }));
 app.use(express.json());

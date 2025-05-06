@@ -144,7 +144,7 @@ class ApiService {
         clearTimeout(timeoutId);
         
         console.log('Response status:', response.status);
-        console.log('Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
+        // console.log('Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
       
       // Handle non-JSON responses
       const contentType = response.headers.get('content-type');
